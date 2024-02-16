@@ -1,0 +1,23 @@
+server:
+  addr: 0.0.0.0:4000
+data:
+  # 数据库配置
+  database:
+    driver: postgres
+    host: 10.10.10.10
+    port: 5432
+    username: postgres
+    password: admin
+    db-name: go-example
+  # redis配置
+  redis:
+    host: 10.10.10.10
+    port: 6379
+    username: default
+    password: admin
+    index: 1
+# jwt配置
+jwt:
+  issue: 'go-fiber-end-layout'
+  expire-time: 24h
+  secret: 'hello world'
