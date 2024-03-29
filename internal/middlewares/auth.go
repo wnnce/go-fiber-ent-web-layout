@@ -44,46 +44,21 @@ func (a *AuthMiddleware) TokenAuth(ctx *fiber.Ctx) error {
 	return ctx.Next()
 }
 
-func (a *AuthMiddleware) ExampleSelectPermissions(ctx *fiber.Ctx) error {
-	if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
-		for _, value := range scopes {
-			if value == "all" || value == "example_select" {
-				return ctx.Next()
+// VerifyPermissions 用户权限验证
+func (a *AuthMiddleware) VerifyPermissions(permissions ...string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
+			for _, value := range scopes {
+				if value == "all" {
+					return ctx.Next()
+				}
+				for _, p := range permissions {
+					if p == value {
+						return ctx.Next()
+					}
+				}
 			}
 		}
+		return fiber.NewError(http.StatusForbidden, "No permission")
 	}
-	return fiber.NewError(http.StatusForbidden, "No permission")
-}
-
-func (a *AuthMiddleware) ExampleCreatePermissions(ctx *fiber.Ctx) error {
-	if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
-		for _, value := range scopes {
-			if value == "all" || value == "example_create" {
-				return ctx.Next()
-			}
-		}
-	}
-	return fiber.NewError(http.StatusForbidden, "No permission")
-}
-
-func (a *AuthMiddleware) ExampleUpdatePermissions(ctx *fiber.Ctx) error {
-	if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
-		for _, value := range scopes {
-			if value == "all" || value == "example_update" {
-				return ctx.Next()
-			}
-		}
-	}
-	return fiber.NewError(http.StatusForbidden, "No permission")
-}
-
-func (a *AuthMiddleware) ExampleDeletePermissions(ctx *fiber.Ctx) error {
-	if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
-		for _, value := range scopes {
-			if value == "all" || value == "example_delete" {
-				return ctx.Next()
-			}
-		}
-	}
-	return fiber.NewError(http.StatusForbidden, "No permission")
 }

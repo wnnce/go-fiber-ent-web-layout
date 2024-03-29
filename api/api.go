@@ -13,9 +13,9 @@ var InjectSet = wire.NewSet(example.NewExampleApi, user.NewUserApi)
 // RegisterRoutes 全局路由绑定处理函数 在newApp函数中调用 不然wire无法处理依赖注入
 func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi, auth *middlewares.AuthMiddleware) {
 	exampleRoute := app.Group("/example", auth.TokenAuth)
-	exampleRoute.Post("/", auth.ExampleCreatePermissions, eApi.SaveExample)
-	exampleRoute.Put("/", auth.ExampleUpdatePermissions, eApi.UpdateExample)
-	exampleRoute.Get("/list", auth.ExampleSelectPermissions, eApi.ListExample)
+	exampleRoute.Post("/", auth.VerifyPermissions("example:save"), eApi.SaveExample)
+	exampleRoute.Put("/", auth.VerifyPermissions("example:update"), eApi.UpdateExample)
+	exampleRoute.Get("/list", auth.VerifyPermissions("example:list"), eApi.ListExample)
 	exampleRoute.Get("/:id<int;min(1)>", eApi.QueryExample)
 
 	userRoute := app.Group("/user")
