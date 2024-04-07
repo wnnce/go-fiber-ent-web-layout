@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -58,7 +59,7 @@ func main() {
 		panic(err)
 	}
 	defer cleanup()
-	if err = app.Listen(config.Server.Addr); err != nil {
+	if err = app.Listen(fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)); err != nil {
 		panic(err)
 	}
 }

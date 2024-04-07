@@ -13,7 +13,9 @@ type Bootstrap struct {
 }
 
 type Server struct {
-	Addr string `json:"addr" yaml:"addr"`
+	Host    string        `json:"host" yaml:"host"`
+	Port    uint          `json:"port" yaml:"port"`
+	Timeout time.Duration `json:"timeout" yaml:"timeout"`
 }
 
 type Data struct {
