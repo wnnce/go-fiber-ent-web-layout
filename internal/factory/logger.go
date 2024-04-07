@@ -40,8 +40,8 @@ func SetLoggerOptions(op *LoggerOptions) {
 }
 
 // GetLogger 获取全局日志对象
-// contextName 参数会在日志中输入 可以用来区别不同的模块或文件
-func GetLogger(contextName string) *slog.Logger {
+// traceName 参数会在日志中输入 可以用来区别不同的模块或文件
+func GetLogger(traceName string) *slog.Logger {
 	once.Do(initLogger)
-	return logger.With("context-name", contextName)
+	return logger.With("trace-name", traceName)
 }

@@ -11,7 +11,7 @@ import (
 	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/conf"
 	"go-fiber-ent-web-layout/internal/factory"
-	"go-fiber-ent-web-layout/internal/middlewares"
+	"go-fiber-ent-web-layout/internal/middleware"
 	"log/slog"
 	"os"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 // 创建fiber app 包含注入中间件、错误处理、路由绑定等操作
-func newApp(eApi *example.ExampleApi, uApi *user.UserApi, auth *middlewares.AuthMiddleware) *fiber.App {
+func newApp(eApi *example.ExampleApi, uApi *user.UserApi, auth *middleware.AuthMiddleware) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      appName,                   // 应用名称
 		ErrorHandler: common.CustomErrorHandler, // 自定义错误处理器

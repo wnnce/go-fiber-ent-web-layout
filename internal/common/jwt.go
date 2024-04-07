@@ -57,27 +57,26 @@ func NewJwtService(c *conf.Jwt) *JwtService {
 	}
 }
 
-func (j *JwtService) CreateToken(sub interface{}, scopes []string) (string, error) {
+func (j *JwtService) CreateToken(sub interface{}) (string, error) {
 	subString, err := sonic.Marshal(sub)
 	if err != nil {
 		return "", err
 	}
 	currentTime := time.Now()
 	numberDate := &jwt.NumericDate{Time: currentTime}
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    j.c.Issue,
 		NotBefore: numberDate,
 		IssuedAt:  numberDate,
 		ExpiresAt: &jwt.NumericDate{Time: currentTime.Add(j.c.ExpireTime)},
 		Subject:   string(subString),
-		Scope:     scopes,
 		ID:        strconv.FormatInt(currentTime.UnixMilli(), 10),
 	})
 	return t.SignedString([]byte(j.c.Secret))
 }
 
-func (j *JwtService) VerifyToken(tokenString string) (*CustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (j *JwtService) VerifyToken(tokenString string) (*jwt.RegisteredClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			j.logger.Error("token unexpected signing method")
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -88,7 +87,7 @@ func (j *JwtService) VerifyToken(tokenString string) (*CustomClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-	claims, ok := token.Claims.(*CustomClaims)
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
 		j.logger.Error("failed to resolve Claims")
 		return nil, fmt.Errorf("failed to resolve Claims")

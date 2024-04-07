@@ -1,10 +1,12 @@
-package middlewares
+package middleware
 
 import (
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
+	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/factory"
+	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,12 +16,14 @@ import (
 type AuthMiddleware struct {
 	logger     *slog.Logger
 	jwtService *common.JwtService
+	loginCache cache.LoginUserCache
 }
 
-func NewAuthMiddleware(jwtService *common.JwtService) *AuthMiddleware {
+func NewAuthMiddleware(jwtService *common.JwtService, loginCache cache.LoginUserCache) *AuthMiddleware {
 	return &AuthMiddleware{
 		logger:     factory.GetLogger("AuthMiddleware"),
 		jwtService: jwtService,
+		loginCache: loginCache,
 	}
 }
 
@@ -32,6 +36,7 @@ func (a *AuthMiddleware) TokenAuth(ctx *fiber.Ctx) error {
 		return common.FiberAuthError("The token does not exist")
 	}
 	claims, err := a.jwtService.VerifyToken(authorization[0][7:])
+	// 判断Token时间是否符合要求
 	currentTime := time.Now()
 	if err != nil || claims.NotBefore.After(currentTime) {
 		return common.FiberAuthError("Invalid token")
@@ -39,16 +44,31 @@ func (a *AuthMiddleware) TokenAuth(ctx *fiber.Ctx) error {
 	if claims.ExpiresAt.Before(currentTime) {
 		return common.FiberAuthError("The token has expired")
 	}
-	ctx.Locals("tokenSub", claims.Subject)
-	ctx.Locals("tokenScope", claims.Scope)
-	return ctx.Next()
+	// 是否能从Token中解析出用户配置
+	user := &usercase.User{}
+	if err = sonic.UnmarshalString(claims.Subject, user); err != nil {
+		return common.FiberAuthError("Invalid token")
+	}
+	// 判断用户的登录状态是否还有效
+	loginUser := a.loginCache.GetLoginUser(user.GetUserId())
+	if loginUser == nil {
+		return common.FiberAuthError("The user login is invalid")
+	}
+
+	// 设置请求用户缓存
+	requestId := ctx.Context().ID()
+	cache.SetRequestUser(requestId, loginUser)
+	err = ctx.Next()
+	// 请求完成后清除请求用户缓存
+	cache.ClearRequestUser(requestId)
+	return err
 }
 
 // VerifyPermissions 用户权限验证
 func (a *AuthMiddleware) VerifyPermissions(permissions ...string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		if scopes, ok := ctx.Locals("tokenScope").(jwt.ClaimStrings); ok {
-			for _, value := range scopes {
+		if requestUser := cache.GetRequestUser(ctx.Context().ID()); requestUser != nil {
+			for _, value := range requestUser.GetPermissions() {
 				if value == "all" {
 					return ctx.Next()
 				}
