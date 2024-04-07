@@ -34,6 +34,7 @@ func newApp(eApi *example.ExampleApi, uApi *user.UserApi, auth *middleware.AuthM
 		EnableStackTrace:  true,
 		StackTraceHandler: common.CustomStackTraceHandler,
 	}))
+	app.Use(middleware.HandlerTimeMiddleware)
 	api.RegisterRoutes(app, eApi, uApi, auth)
 	return app
 }
