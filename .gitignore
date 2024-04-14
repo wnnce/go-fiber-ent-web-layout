@@ -21,3 +21,5 @@
 go.work
 
 .idea
+
+configs/config-prod.yaml

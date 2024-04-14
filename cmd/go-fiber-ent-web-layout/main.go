@@ -37,7 +37,7 @@ func newApp(cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth 
 }
 
 func init() {
-	flag.StringVar(&confPath, "conf", "/configs/config.yaml", "config path, eg: -conf config.yaml")
+	flag.StringVar(&confPath, "conf", "/configs/config-dev.yaml", "config path, eg: -conf config-dev.yaml")
 }
 
 func main() {
