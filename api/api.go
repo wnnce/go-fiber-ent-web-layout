@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"

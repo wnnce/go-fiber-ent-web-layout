@@ -1,10 +1,9 @@
 package example
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/ent"
 	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/factory"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 )
@@ -16,13 +15,13 @@ type ExampleApi struct {
 
 func NewExampleApi(epService usercase.IExampleService) *ExampleApi {
 	return &ExampleApi{
-		logger:  factory.GetLogger("example-api"),
+		logger:  slog.Default().With("trace-name", "example-api"),
 		service: epService,
 	}
 }
 
-func (e *ExampleApi) QueryExample(ctx *fiber.Ctx) error {
-	id, _ := ctx.ParamsInt("id")
+func (e *ExampleApi) QueryExample(ctx fiber.Ctx) error {
+	id := fiber.Params[int](ctx, "id")
 	example, err := e.service.QueryExampleInfo(id)
 	if err != nil {
 		return err
@@ -30,7 +29,7 @@ func (e *ExampleApi) QueryExample(ctx *fiber.Ctx) error {
 	return ctx.JSON(common.OkByData(example))
 }
 
-func (e *ExampleApi) ListExample(ctx *fiber.Ctx) error {
+func (e *ExampleApi) ListExample(ctx fiber.Ctx) error {
 	exampleList, err := e.service.ListExample()
 	if err != nil {
 		return err
@@ -38,9 +37,9 @@ func (e *ExampleApi) ListExample(ctx *fiber.Ctx) error {
 	return ctx.JSON(common.OkByData(exampleList))
 }
 
-func (e *ExampleApi) SaveExample(ctx *fiber.Ctx) error {
+func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
 	example := &ent.Example{}
-	if err := ctx.BodyParser(example); err != nil {
+	if err := ctx.Bind().JSON(example); err != nil {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {
@@ -52,9 +51,9 @@ func (e *ExampleApi) SaveExample(ctx *fiber.Ctx) error {
 	return ctx.JSON(common.OkByMessage("ok"))
 }
 
-func (e *ExampleApi) UpdateExample(ctx *fiber.Ctx) error {
+func (e *ExampleApi) UpdateExample(ctx fiber.Ctx) error {
 	example := &ent.Example{}
-	if err := ctx.BodyParser(example); err != nil {
+	if err := ctx.Bind().JSON(example); err != nil {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {

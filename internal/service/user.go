@@ -3,7 +3,6 @@ package service
 import (
 	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/factory"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 )
@@ -35,7 +34,7 @@ type UserService struct {
 
 func NewUserService(jwtService *common.JwtService, loginCache cache.LoginUserCache) usercase.IUserService {
 	return &UserService{
-		logger:     factory.GetLogger("user-service"),
+		logger:     slog.Default().With("trace-name", "user-service"),
 		jwtService: jwtService,
 		loginCache: loginCache,
 	}

@@ -3,7 +3,6 @@ package service
 import (
 	"go-fiber-ent-web-layout/ent"
 	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/factory"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 	"time"
@@ -16,7 +15,7 @@ type ExampleService struct {
 
 func NewExampleService(epRepo usercase.IExampleRepo) usercase.IExampleService {
 	return &ExampleService{
-		logger: factory.GetLogger("example-service"),
+		logger: slog.Default().With("trace-name", "example-service"),
 		epRepo: epRepo,
 	}
 }

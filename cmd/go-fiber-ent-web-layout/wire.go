@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
 	"go-fiber-ent-web-layout/api"
 	"go-fiber-ent-web-layout/internal/cache"
@@ -16,6 +16,6 @@ import (
 )
 
 // wireApp generate inject code
-func wireApp(*conf.Data, *conf.Jwt) (*fiber.App, func(), error) {
+func wireApp(*conf.Data, *conf.Jwt, *conf.Server) (*fiber.App, func(), error) {
 	panic(wire.Build(api.InjectSet, data.InjectSet, service.InjectSet, common.InjectSet, cache.InjectSet, middleware.NewAuthMiddleware, newApp))
 }

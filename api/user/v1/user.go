@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/usercase"
 )
@@ -16,9 +16,9 @@ func NewUserApi(service usercase.IUserService) *UserApi {
 	}
 }
 
-func (ua *UserApi) Login(ctx *fiber.Ctx) error {
+func (ua *UserApi) Login(ctx fiber.Ctx) error {
 	user := &usercase.User{}
-	if err := ctx.BodyParser(user); err != nil {
+	if err := ctx.Bind().JSON(user); err != nil {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(user); len(errorMessage) > 0 {

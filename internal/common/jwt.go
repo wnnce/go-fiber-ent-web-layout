@@ -5,7 +5,6 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/golang-jwt/jwt/v5"
 	"go-fiber-ent-web-layout/internal/conf"
-	"go-fiber-ent-web-layout/internal/factory"
 	"log/slog"
 	"strconv"
 	"time"
@@ -52,7 +51,7 @@ type JwtService struct {
 
 func NewJwtService(c *conf.Jwt) *JwtService {
 	return &JwtService{
-		logger: factory.GetLogger("jwt-service"),
+		logger: slog.Default().With("trace-name", "jwt-service"),
 		c:      c,
 	}
 }

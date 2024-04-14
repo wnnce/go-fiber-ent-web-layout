@@ -2,10 +2,9 @@ package middleware
 
 import (
 	"github.com/bytedance/sonic"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/factory"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 	"net/http"
@@ -21,7 +20,7 @@ type AuthMiddleware struct {
 
 func NewAuthMiddleware(jwtService *common.JwtService, loginCache cache.LoginUserCache) *AuthMiddleware {
 	return &AuthMiddleware{
-		logger:     factory.GetLogger("AuthMiddleware"),
+		logger:     slog.Default().With("trace-name", "AuthMiddleware"),
 		jwtService: jwtService,
 		loginCache: loginCache,
 	}
@@ -29,7 +28,7 @@ func NewAuthMiddleware(jwtService *common.JwtService, loginCache cache.LoginUser
 
 // TokenAuth 登录验证，如果Token验证成功就将Sub参数和Scope权限参数存储到ctx.Locals中
 // 后续中间件或者请求处理函数需要使用时，可以直接获取并使用类型转换
-func (a *AuthMiddleware) TokenAuth(ctx *fiber.Ctx) error {
+func (a *AuthMiddleware) TokenAuth(ctx fiber.Ctx) error {
 	headers := ctx.GetReqHeaders()
 	authorization, ok := headers[fiber.HeaderAuthorization]
 	if !ok || len(authorization[0]) <= 7 {
@@ -66,7 +65,7 @@ func (a *AuthMiddleware) TokenAuth(ctx *fiber.Ctx) error {
 
 // VerifyPermissions 用户权限验证
 func (a *AuthMiddleware) VerifyPermissions(permissions ...string) fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
+	return func(ctx fiber.Ctx) error {
 		if requestUser := cache.GetRequestUser(ctx.Context().ID()); requestUser != nil {
 			for _, value := range requestUser.GetPermissions() {
 				if value == "all" {

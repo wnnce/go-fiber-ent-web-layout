@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"net/http"
 	"time"
 )

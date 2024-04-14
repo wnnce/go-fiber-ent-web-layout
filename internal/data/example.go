@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"go-fiber-ent-web-layout/ent"
-	"go-fiber-ent-web-layout/internal/factory"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 	"strconv"
@@ -23,7 +22,7 @@ var (
 func NewExampleRepo(data *Data) usercase.IExampleRepo {
 	return &ExampleRepo{
 		data:   data,
-		logger: factory.GetLogger("example-repo"),
+		logger: slog.Default().With("trace-name", "example-repo"),
 	}
 }
 
