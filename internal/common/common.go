@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
+	res "go-fiber-ent-web-layout/internal/common/res"
 	"log/slog"
 	"net/http"
 )
@@ -25,6 +26,6 @@ func CustomErrorHandler(ctx fiber.Ctx, err error) error {
 		code = e.Code
 		message = e.Message
 	}
-	result := Fail(code, message)
+	result := res.Fail(code, message)
 	return ctx.Status(code).JSON(result)
 }

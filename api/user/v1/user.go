@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/internal/common"
+	"go-fiber-ent-web-layout/internal/common/res"
 	"go-fiber-ent-web-layout/internal/usercase"
 )
 
@@ -22,11 +23,11 @@ func (ua *UserApi) Login(ctx fiber.Ctx) error {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(user); len(errorMessage) > 0 {
-		return common.FiberRequestError(errorMessage)
+		return res.FiberRequestError(errorMessage)
 	}
 	token, err := ua.service.Login(user)
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(common.OkByData(map[string]string{"token": token}))
+	return ctx.JSON(res.OkByData(map[string]string{"token": token}))
 }

@@ -3,6 +3,11 @@ server:
   host: 0.0.0.0
   port: 4000
   timeout: 5s
+  limiter:
+    sliding:
+      enable: true
+    token-bucket:
+      enable: true
 data:
   # 数据库配置
   database:

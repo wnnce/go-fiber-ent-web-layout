@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"
@@ -14,14 +15,14 @@ import (
 	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/conf"
 	"go-fiber-ent-web-layout/internal/data"
-	"go-fiber-ent-web-layout/internal/middleware"
+	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/service"
 )
 
 // Injectors from wire.go:
 
 // wireApp generate inject code
-func wireApp(confData *conf.Data, jwt *conf.Jwt, server *conf.Server) (*fiber.App, func(), error) {
+func wireApp(contextContext context.Context, confData *conf.Data, jwt *conf.Jwt, server *conf.Server) (*fiber.App, func(), error) {
 	dataData, cleanup, err := data.NewData(confData)
 	if err != nil {
 		return nil, nil, err
@@ -33,8 +34,8 @@ func wireApp(confData *conf.Data, jwt *conf.Jwt, server *conf.Server) (*fiber.Ap
 	loginUserCache := cache.NewLoginUserCache()
 	iUserService := service.NewUserService(jwtService, loginUserCache)
 	userApi := user.NewUserApi(iUserService)
-	authMiddleware := middleware.NewAuthMiddleware(jwtService, loginUserCache)
-	app := newApp(server, exampleApi, userApi, authMiddleware)
+	authMiddleware := auth.NewAuthMiddleware(jwtService, loginUserCache)
+	app := newApp(contextContext, server, exampleApi, userApi, authMiddleware)
 	return app, func() {
 		cleanup()
 	}, nil

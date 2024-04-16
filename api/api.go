@@ -5,13 +5,13 @@ import (
 	"github.com/google/wire"
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"
-	"go-fiber-ent-web-layout/internal/middleware"
+	"go-fiber-ent-web-layout/internal/middleware/auth"
 )
 
 var InjectSet = wire.NewSet(example.NewExampleApi, user.NewUserApi)
 
 // RegisterRoutes 全局路由绑定处理函数 在newApp函数中调用 不然wire无法处理依赖注入
-func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi, auth *middleware.AuthMiddleware) {
+func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi, auth *auth.AuthMiddleware) {
 	exampleRoute := app.Group("/example", auth.TokenAuth)
 	exampleRoute.Post("/", auth.VerifyPermissions("example:save"), eApi.SaveExample)
 	exampleRoute.Put("/", auth.VerifyPermissions("example:update"), eApi.UpdateExample)

@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"go-fiber-ent-web-layout/internal/middleware/limiter"
 	"gopkg.in/yaml.v2"
 	"os"
 	"time"
@@ -17,6 +18,10 @@ type Server struct {
 	Host    string        `json:"host" yaml:"host"`
 	Port    uint          `json:"port" yaml:"port"`
 	Timeout time.Duration `json:"timeout" yaml:"timeout"`
+	Limiter struct {
+		Sliding     limiter.SlidingConfig     `json:"sliding" yaml:"sliding"`
+		TokenBucket limiter.TokenBucketConfig `json:"tokenBuket" yaml:"token-buket"`
+	} `json:"limiter" yaml:"limiter"` // 限流配置
 }
 
 type Data struct {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/bytedance/sonic"
@@ -11,7 +12,9 @@ import (
 	"go-fiber-ent-web-layout/api/user/v1"
 	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/conf"
-	"go-fiber-ent-web-layout/internal/middleware"
+	"go-fiber-ent-web-layout/internal/middleware/auth"
+	"go-fiber-ent-web-layout/internal/middleware/limiter"
+	"go-fiber-ent-web-layout/internal/middleware/timeout"
 	"log/slog"
 	"os"
 )
@@ -19,7 +22,7 @@ import (
 var confPath string
 
 // 创建fiber app 包含注入中间件、错误处理、路由绑定等操作
-func newApp(cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth *middleware.AuthMiddleware) *fiber.App {
+func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth *auth.AuthMiddleware) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      cf.Name,                   // 应用名称
 		ErrorHandler: common.CustomErrorHandler, // 自定义错误处理器
@@ -31,13 +34,19 @@ func newApp(cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth 
 		EnableStackTrace:  true,
 		StackTraceHandler: common.CustomStackTraceHandler,
 	}))
-	app.Use(middleware.TimeoutMiddleware(cf.Timeout))
+	app.Use(timeout.NewMiddleware(cf.Timeout))
+	app.Use(limiter.NewMiddleware(limiter.Config{
+		KeyGenerate:     limiter.Md5KeyGenerate(),
+		CallbackHandler: limiter.DefaultCallbackHandler,
+		Sliding:         cf.Limiter.Sliding,
+		TokenBucket:     cf.Limiter.TokenBucket,
+	}, ctx))
 	api.RegisterRoutes(app, eApi, uApi, auth)
 	return app
 }
 
 func init() {
-	flag.StringVar(&confPath, "conf", "/configs/config-dev.yaml", "config path, eg: -conf config-dev.yaml")
+	flag.StringVar(&confPath, "conf", "/configs/config-prod.yaml", "config path, eg: -conf config-prod.yaml")
 }
 
 func main() {
@@ -45,14 +54,19 @@ func main() {
 	config := conf.ReadConfig(confPath)
 	// 初始化日志
 	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		AddSource: true,
+		Level:     slog.LevelInfo,
 	})
 	slog.SetDefault(slog.New(handler).With("app-name", config.Server.Name))
-	app, cleanup, err := wireApp(config.Data, config.Jwt, config.Server)
+	ctx, cancel := context.WithCancel(context.Background())
+	app, cleanup, err := wireApp(ctx, config.Data, config.Jwt, config.Server)
 	if err != nil {
 		panic(err)
 	}
-	defer cleanup()
+	defer func() {
+		cancel()
+		cleanup()
+	}()
 	if err = app.Listen(fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)); err != nil {
 		panic(err)
 	}

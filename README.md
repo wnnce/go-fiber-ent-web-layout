@@ -18,7 +18,7 @@
 ### 通用返回消息
 
 ```go
-// /cmd/internal/common/result.go
+// /cmd/internal/common/res.go
 
 type Result struct {
 	Code      int         `json:"code,omitempty"`

@@ -447,7 +447,7 @@ func (egb *ExampleGroupBy) Aggregate(fns ...AggregateFunc) *ExampleGroupBy {
 	return egb
 }
 
-// Scan applies the selector query and scans the result into the given value.
+// Scan applies the selector query and scans the res into the given value.
 func (egb *ExampleGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, egb.build.ctx, "GroupBy")
 	if err := egb.build.prepareQuery(ctx); err != nil {
@@ -495,7 +495,7 @@ func (es *ExampleSelect) Aggregate(fns ...AggregateFunc) *ExampleSelect {
 	return es
 }
 
-// Scan applies the selector query and scans the result into the given value.
+// Scan applies the selector query and scans the res into the given value.
 func (es *ExampleSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, es.ctx, "Select")
 	if err := es.prepareQuery(ctx); err != nil {

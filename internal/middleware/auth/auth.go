@@ -1,26 +1,24 @@
-package middleware
+package auth
 
 import (
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/common"
+	"go-fiber-ent-web-layout/internal/common/res"
 	"go-fiber-ent-web-layout/internal/usercase"
-	"log/slog"
 	"net/http"
 	"time"
 )
 
 // AuthMiddleware 用户登录权限验证中间件
 type AuthMiddleware struct {
-	logger     *slog.Logger
 	jwtService *common.JwtService
 	loginCache cache.LoginUserCache
 }
 
 func NewAuthMiddleware(jwtService *common.JwtService, loginCache cache.LoginUserCache) *AuthMiddleware {
 	return &AuthMiddleware{
-		logger:     slog.Default().With("trace-name", "AuthMiddleware"),
 		jwtService: jwtService,
 		loginCache: loginCache,
 	}
@@ -32,26 +30,26 @@ func (a *AuthMiddleware) TokenAuth(ctx fiber.Ctx) error {
 	headers := ctx.GetReqHeaders()
 	authorization, ok := headers[fiber.HeaderAuthorization]
 	if !ok || len(authorization[0]) <= 7 {
-		return common.FiberAuthError("The token does not exist")
+		return res.FiberAuthError("The token does not exist")
 	}
 	claims, err := a.jwtService.VerifyToken(authorization[0][7:])
 	// 判断Token时间是否符合要求
 	currentTime := time.Now()
 	if err != nil || claims.NotBefore.After(currentTime) {
-		return common.FiberAuthError("Invalid token")
+		return res.FiberAuthError("Invalid token")
 	}
 	if claims.ExpiresAt.Before(currentTime) {
-		return common.FiberAuthError("The token has expired")
+		return res.FiberAuthError("The token has expired")
 	}
 	// 是否能从Token中解析出用户配置
 	user := &usercase.User{}
 	if err = sonic.UnmarshalString(claims.Subject, user); err != nil {
-		return common.FiberAuthError("Invalid token")
+		return res.FiberAuthError("Invalid token")
 	}
 	// 判断用户的登录状态是否还有效
 	loginUser := a.loginCache.GetLoginUser(user.GetUserId())
 	if loginUser == nil {
-		return common.FiberAuthError("The user login is invalid")
+		return res.FiberAuthError("The user login is invalid")
 	}
 
 	// 设置请求用户缓存

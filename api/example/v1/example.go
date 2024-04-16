@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/ent"
 	"go-fiber-ent-web-layout/internal/common"
+	"go-fiber-ent-web-layout/internal/common/res"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 )
@@ -26,7 +27,7 @@ func (e *ExampleApi) QueryExample(ctx fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(common.OkByData(example))
+	return ctx.JSON(res.OkByData(example))
 }
 
 func (e *ExampleApi) ListExample(ctx fiber.Ctx) error {
@@ -34,7 +35,7 @@ func (e *ExampleApi) ListExample(ctx fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(common.OkByData(exampleList))
+	return ctx.JSON(res.OkByData(exampleList))
 }
 
 func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
@@ -43,12 +44,12 @@ func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(common.FiberRequestError(errorMessage))
+		return ctx.JSON(res.FiberRequestError(errorMessage))
 	}
 	if err := e.service.SaveExample(example); err != nil {
 		return err
 	}
-	return ctx.JSON(common.OkByMessage("ok"))
+	return ctx.JSON(res.OkByMessage("ok"))
 }
 
 func (e *ExampleApi) UpdateExample(ctx fiber.Ctx) error {
@@ -57,13 +58,13 @@ func (e *ExampleApi) UpdateExample(ctx fiber.Ctx) error {
 		return err
 	}
 	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(common.FiberRequestError(errorMessage))
+		return ctx.JSON(res.FiberRequestError(errorMessage))
 	}
 	if example.ID <= 0 {
-		return ctx.JSON(common.FiberRequestError("example不存在"))
+		return ctx.JSON(res.FiberRequestError("example不存在"))
 	}
 	if err := e.service.UpdateExample(example); err != nil {
 		return err
 	}
-	return ctx.JSON(common.OkByMessage("ok"))
+	return ctx.JSON(res.OkByMessage("ok"))
 }

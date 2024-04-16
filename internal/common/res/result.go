@@ -1,4 +1,4 @@
-package common
+package res
 
 import (
 	"github.com/gofiber/fiber/v3"

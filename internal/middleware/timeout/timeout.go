@@ -1,4 +1,4 @@
-package middleware
+package timeout
 
 import (
 	"context"
@@ -8,7 +8,9 @@ import (
 	"time"
 )
 
-func TimeoutMiddleware(timeout time.Duration) fiber.Handler {
+// NewMiddleware 返回请求超时中间件
+// 向请求ctx中set一个WithTimeout的Context
+func NewMiddleware(timeout time.Duration) fiber.Handler {
 	return func(ctx fiber.Ctx) error {
 		beforeTime := time.Now().UnixMilli()
 		cont, cancel := context.WithTimeout(ctx.Context(), timeout)
