@@ -44,19 +44,25 @@ func (c CustomClaims) GetScope() (jwt.ClaimStrings, error) {
 	return c.Scope, nil
 }
 
-type JwtService struct {
-	logger *slog.Logger
-	c      *conf.Jwt
-}
+var (
+	issue      = "jwt"
+	expireTime = 24 * time.Hour
+	secret     = "secret"
+)
 
-func NewJwtService(c *conf.Jwt) *JwtService {
-	return &JwtService{
-		logger: slog.Default().With("trace-name", "jwt-service"),
-		c:      c,
+func SetJwtConfig(config conf.Jwt) {
+	if config.Issue != "" {
+		issue = config.Issue
+	}
+	if config.ExpireTime > 0 {
+		expireTime = config.ExpireTime
+	}
+	if config.Secret != "" {
+		secret = config.Secret
 	}
 }
 
-func (j *JwtService) CreateToken(sub interface{}) (string, error) {
+func GenerateToken(sub interface{}) (string, error) {
 	subString, err := sonic.Marshal(sub)
 	if err != nil {
 		return "", err
@@ -64,31 +70,31 @@ func (j *JwtService) CreateToken(sub interface{}) (string, error) {
 	currentTime := time.Now()
 	numberDate := &jwt.NumericDate{Time: currentTime}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		Issuer:    j.c.Issue,
+		Issuer:    issue,
 		NotBefore: numberDate,
 		IssuedAt:  numberDate,
-		ExpiresAt: &jwt.NumericDate{Time: currentTime.Add(j.c.ExpireTime)},
+		ExpiresAt: &jwt.NumericDate{Time: currentTime.Add(expireTime)},
 		Subject:   string(subString),
 		ID:        strconv.FormatInt(currentTime.UnixMilli(), 10),
 	})
-	return t.SignedString([]byte(j.c.Secret))
+	return t.SignedString([]byte(secret))
 }
 
-func (j *JwtService) VerifyToken(tokenString string) (*jwt.RegisteredClaims, error) {
+func VerifyToken(tokenString string) (*jwt.RegisteredClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			j.logger.Error("token unexpected signing method")
+			slog.Error("token unexpected signing method")
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(j.c.Secret), nil
+		return []byte(secret), nil
 	})
 	if err != nil {
 		return nil, err
 	}
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		j.logger.Error("failed to resolve Claims")
+		slog.Error("failed to resolve Claims")
 		return nil, fmt.Errorf("failed to resolve Claims")
 	}
 	return claims, nil

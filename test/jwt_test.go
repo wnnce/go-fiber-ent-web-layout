@@ -11,14 +11,14 @@ import (
 )
 
 func TestTokenGenerate(t *testing.T) {
-	jwtConf := &conf.Jwt{
+	jwtConf := conf.Jwt{
 		Issue:      "layout",
 		Secret:     "hello world",
 		ExpireTime: 24 * time.Hour,
 	}
-	jwtService := tools.NewJwtService(jwtConf)
+	tools.SetJwtConfig(jwtConf)
 
-	token, err := jwtService.CreateToken(&usercase.User{
+	token, err := tools.GenerateToken(&usercase.User{
 		UserId:   1,
 		Username: "admin",
 		Scopes:   []string{"select", "create"},
@@ -29,7 +29,7 @@ func TestTokenGenerate(t *testing.T) {
 		println(token)
 	}
 
-	claims, err := jwtService.VerifyToken(token)
+	claims, err := tools.VerifyToken(token)
 	if err != nil {
 		println(err)
 	} else {

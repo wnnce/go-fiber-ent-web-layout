@@ -12,13 +12,11 @@ import (
 
 // AuthMiddleware 用户登录权限验证中间件
 type AuthMiddleware struct {
-	jwtService *tools.JwtService
 	loginCache cache.LoginUserCache
 }
 
-func NewAuthMiddleware(jwtService *tools.JwtService, loginCache cache.LoginUserCache) *AuthMiddleware {
+func NewAuthMiddleware(loginCache cache.LoginUserCache) *AuthMiddleware {
 	return &AuthMiddleware{
-		jwtService: jwtService,
 		loginCache: loginCache,
 	}
 }
@@ -31,7 +29,7 @@ func (a *AuthMiddleware) TokenAuth(ctx fiber.Ctx) error {
 	if !ok || len(authorization[0]) <= 7 {
 		return tools.FiberAuthError("The token does not exist")
 	}
-	claims, err := a.jwtService.VerifyToken(authorization[0][7:])
+	claims, err := tools.VerifyToken(authorization[0][7:])
 	// 判断Token时间是否符合要求
 	currentTime := time.Now()
 	if err != nil || claims.NotBefore.After(currentTime) {

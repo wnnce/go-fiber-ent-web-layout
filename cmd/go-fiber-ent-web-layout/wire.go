@@ -13,10 +13,9 @@ import (
 	"go-fiber-ent-web-layout/internal/data"
 	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/service"
-	"go-fiber-ent-web-layout/internal/tools"
 )
 
 // wireApp generate inject code
 func wireApp(context.Context, *conf.Data, *conf.Jwt, *conf.Server) (*fiber.App, func(), error) {
-	panic(wire.Build(api.InjectSet, data.InjectSet, service.InjectSet, tools.InjectSet, cache.InjectSet, auth.NewAuthMiddleware, newApp))
+	panic(wire.Build(api.InjectSet, data.InjectSet, service.InjectSet, cache.InjectSet, auth.NewAuthMiddleware, newApp))
 }

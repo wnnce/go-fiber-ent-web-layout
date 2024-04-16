@@ -4,14 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
-	"github.com/google/wire"
 	res "go-fiber-ent-web-layout/internal/tools/res"
 	"log/slog"
 	"net/http"
-)
-
-var (
-	InjectSet = wire.NewSet(NewJwtService)
 )
 
 func CustomStackTraceHandler(ctx fiber.Ctx, e interface{}) {

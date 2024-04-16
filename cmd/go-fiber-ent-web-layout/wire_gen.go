@@ -16,7 +16,6 @@ import (
 	"go-fiber-ent-web-layout/internal/data"
 	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/service"
-	"go-fiber-ent-web-layout/internal/tools"
 )
 
 // Injectors from wire.go:
@@ -30,11 +29,10 @@ func wireApp(contextContext context.Context, confData *conf.Data, jwt *conf.Jwt,
 	iExampleRepo := data.NewExampleRepo(dataData)
 	iExampleService := service.NewExampleService(iExampleRepo)
 	exampleApi := example.NewExampleApi(iExampleService)
-	jwtService := tools.NewJwtService(jwt)
 	loginUserCache := cache.NewLoginUserCache()
-	iUserService := service.NewUserService(jwtService, loginUserCache)
+	iUserService := service.NewUserService(loginUserCache)
 	userApi := user.NewUserApi(iUserService)
-	authMiddleware := auth.NewAuthMiddleware(jwtService, loginUserCache)
+	authMiddleware := auth.NewAuthMiddleware(loginUserCache)
 	app := newApp(contextContext, server, exampleApi, userApi, authMiddleware)
 	return app, func() {
 		cleanup()

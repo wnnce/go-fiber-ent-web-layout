@@ -34,7 +34,9 @@ func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi
 		EnableStackTrace:  true,
 		StackTraceHandler: tools.CustomStackTraceHandler,
 	}))
+	// 使用超时中间件
 	app.Use(timeout.NewMiddleware(cf.Timeout))
+	// 使用限流中间件
 	app.Use(limiter.NewMiddleware(limiter.Config{
 		KeyGenerate:     limiter.Md5KeyGenerate(),
 		CallbackHandler: limiter.DefaultCallbackHandler,
@@ -58,6 +60,7 @@ func main() {
 		Level:     slog.LevelInfo,
 	})
 	slog.SetDefault(slog.New(handler).With("app-name", config.Server.Name))
+	tools.SetJwtConfig(*config.Jwt)
 	ctx, cancel := context.WithCancel(context.Background())
 	app, cleanup, err := wireApp(ctx, config.Data, config.Jwt, config.Server)
 	if err != nil {
