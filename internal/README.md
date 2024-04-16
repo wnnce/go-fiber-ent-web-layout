@@ -1,6 +1,6 @@
 **程序内部目录**
 
-- [common](common)：全局函数、工具函数或者一些通用服务的包
+- [common](tools)：全局函数、工具函数或者一些通用服务的包
 - [conf](conf)：定义配置、解析配置
 - [data](data)：处理持久层，包括创建数据库连接客户端，业务的持久层操作等，需要实现[usercase](usercase)中对应的持久层接口
 - [factory](factory)：工厂包，工厂模式使用

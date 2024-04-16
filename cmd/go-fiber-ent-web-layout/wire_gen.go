@@ -12,11 +12,11 @@ import (
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"
 	"go-fiber-ent-web-layout/internal/cache"
-	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/conf"
 	"go-fiber-ent-web-layout/internal/data"
 	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/service"
+	"go-fiber-ent-web-layout/internal/tools"
 )
 
 // Injectors from wire.go:
@@ -30,7 +30,7 @@ func wireApp(contextContext context.Context, confData *conf.Data, jwt *conf.Jwt,
 	iExampleRepo := data.NewExampleRepo(dataData)
 	iExampleService := service.NewExampleService(iExampleRepo)
 	exampleApi := example.NewExampleApi(iExampleService)
-	jwtService := common.NewJwtService(jwt)
+	jwtService := tools.NewJwtService(jwt)
 	loginUserCache := cache.NewLoginUserCache()
 	iUserService := service.NewUserService(jwtService, loginUserCache)
 	userApi := user.NewUserApi(iUserService)

@@ -18,7 +18,7 @@
 ### 通用返回消息
 
 ```go
-// /cmd/internal/common/res.go
+// /cmd/internal/tools/res.go
 
 type Result struct {
 	Code      int         `json:"code,omitempty"`
@@ -31,7 +31,7 @@ type Result struct {
 ### 错误处理
 
 ```go
-// /cmd/internal/common/common.go
+// /cmd/internal/tools/tools.go
 
 func CustomErrorHandler(ctx *fiber.Ctx, err error) error {
 	code, message := http.StatusInternalServerError, "server error"

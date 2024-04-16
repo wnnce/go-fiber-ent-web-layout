@@ -238,7 +238,7 @@ func (eq *ExampleQuery) ExistX(ctx context.Context) bool {
 }
 
 // Clone returns a duplicate of the ExampleQuery builder, including all associated steps. It can be
-// used to prepare common query builders and use them differently after the clone is made.
+// used to prepare tools query builders and use them differently after the clone is made.
 func (eq *ExampleQuery) Clone() *ExampleQuery {
 	if eq == nil {
 		return nil

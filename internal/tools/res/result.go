@@ -1,7 +1,6 @@
 package res
 
 import (
-	"github.com/gofiber/fiber/v3"
 	"net/http"
 	"time"
 )
@@ -45,16 +44,4 @@ func Fail(code int, message string) *Result {
 		Message:   message,
 		Timestamp: time.Now().UnixMilli(),
 	}
-}
-
-func FiberRequestError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusBadRequest, message)
-}
-
-func FiberAuthError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusUnauthorized, message)
-}
-
-func FiberServerError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusInternalServerError, message)
 }

@@ -3,8 +3,8 @@ package example
 import (
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/ent"
-	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/common/res"
+	"go-fiber-ent-web-layout/internal/tools"
+	"go-fiber-ent-web-layout/internal/tools/res"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 )
@@ -43,8 +43,8 @@ func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
 	if err := ctx.Bind().JSON(example); err != nil {
 		return err
 	}
-	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(res.FiberRequestError(errorMessage))
+	if errorMessage := tools.StructFieldValidation(example); len(errorMessage) > 0 {
+		return ctx.JSON(tools.FiberRequestError(errorMessage))
 	}
 	if err := e.service.SaveExample(example); err != nil {
 		return err
@@ -57,11 +57,11 @@ func (e *ExampleApi) UpdateExample(ctx fiber.Ctx) error {
 	if err := ctx.Bind().JSON(example); err != nil {
 		return err
 	}
-	if errorMessage := common.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(res.FiberRequestError(errorMessage))
+	if errorMessage := tools.StructFieldValidation(example); len(errorMessage) > 0 {
+		return ctx.JSON(tools.FiberRequestError(errorMessage))
 	}
 	if example.ID <= 0 {
-		return ctx.JSON(res.FiberRequestError("example不存在"))
+		return ctx.JSON(tools.FiberRequestError("example不存在"))
 	}
 	if err := e.service.UpdateExample(example); err != nil {
 		return err

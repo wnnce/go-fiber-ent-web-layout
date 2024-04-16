@@ -3,7 +3,7 @@ package limiter
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v3"
-	"go-fiber-ent-web-layout/internal/common/res"
+	"go-fiber-ent-web-layout/internal/tools/res"
 	"log/slog"
 	"net/http"
 	"time"

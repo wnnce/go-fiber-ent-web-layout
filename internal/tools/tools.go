@@ -1,11 +1,11 @@
-package common
+package tools
 
 import (
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
-	res "go-fiber-ent-web-layout/internal/common/res"
+	res "go-fiber-ent-web-layout/internal/tools/res"
 	"log/slog"
 	"net/http"
 )
@@ -28,4 +28,16 @@ func CustomErrorHandler(ctx fiber.Ctx, err error) error {
 	}
 	result := res.Fail(code, message)
 	return ctx.Status(code).JSON(result)
+}
+
+func FiberRequestError(message string) *fiber.Error {
+	return fiber.NewError(http.StatusBadRequest, message)
+}
+
+func FiberAuthError(message string) *fiber.Error {
+	return fiber.NewError(http.StatusUnauthorized, message)
+}
+
+func FiberServerError(message string) *fiber.Error {
+	return fiber.NewError(http.StatusInternalServerError, message)
 }

@@ -3,8 +3,8 @@ package test
 import (
 	"fmt"
 	"github.com/bytedance/sonic"
-	"go-fiber-ent-web-layout/internal/common"
 	"go-fiber-ent-web-layout/internal/conf"
+	"go-fiber-ent-web-layout/internal/tools"
 	"testing"
 	"time"
 )
@@ -20,7 +20,7 @@ func TestTokenGenerate(t *testing.T) {
 		Secret:     "hello world",
 		ExpireTime: 24 * time.Hour,
 	}
-	jwtService := common.NewJwtService(jwtConf)
+	jwtService := tools.NewJwtService(jwtConf)
 
 	token, err := jwtService.CreateToken(&user{
 		ID:   1,

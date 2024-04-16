@@ -2,7 +2,7 @@ package service
 
 import (
 	"go-fiber-ent-web-layout/ent"
-	"go-fiber-ent-web-layout/internal/common/res"
+	"go-fiber-ent-web-layout/internal/tools"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 	"time"
@@ -23,7 +23,7 @@ func NewExampleService(epRepo usercase.IExampleRepo) usercase.IExampleService {
 func (es *ExampleService) QueryExampleInfo(id int) (*ent.Example, error) {
 	example, err := es.epRepo.QueryExampleById(id)
 	if err != nil {
-		return nil, res.FiberServerError("查询失败")
+		return nil, tools.FiberServerError("查询失败")
 	}
 	return example, nil
 }
@@ -31,7 +31,7 @@ func (es *ExampleService) QueryExampleInfo(id int) (*ent.Example, error) {
 func (es *ExampleService) ListExample() ([]*ent.Example, error) {
 	example, err := es.epRepo.ListAllExample()
 	if err != nil {
-		return nil, res.FiberServerError("查询失败")
+		return nil, tools.FiberServerError("查询失败")
 	}
 	return example, nil
 }
@@ -39,7 +39,7 @@ func (es *ExampleService) ListExample() ([]*ent.Example, error) {
 func (es *ExampleService) SaveExample(example *ent.Example) error {
 	err := es.epRepo.CreateExample(example)
 	if err != nil {
-		return res.FiberServerError("保存失败")
+		return tools.FiberServerError("保存失败")
 	}
 	return nil
 }
@@ -49,7 +49,7 @@ func (es *ExampleService) UpdateExample(example *ent.Example) error {
 	example.UpdateTime = &currenTime
 	err := es.epRepo.UpdateExampleById(example)
 	if err != nil {
-		return res.FiberServerError("更新失败")
+		return tools.FiberServerError("更新失败")
 	}
 	return nil
 }

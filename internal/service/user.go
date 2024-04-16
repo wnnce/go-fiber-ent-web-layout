@@ -2,8 +2,7 @@ package service
 
 import (
 	"go-fiber-ent-web-layout/internal/cache"
-	"go-fiber-ent-web-layout/internal/common"
-	"go-fiber-ent-web-layout/internal/common/res"
+	"go-fiber-ent-web-layout/internal/tools"
 	"go-fiber-ent-web-layout/internal/usercase"
 	"log/slog"
 )
@@ -29,11 +28,11 @@ var users = []*usercase.User{
 
 type UserService struct {
 	logger     *slog.Logger
-	jwtService *common.JwtService
+	jwtService *tools.JwtService
 	loginCache cache.LoginUserCache
 }
 
-func NewUserService(jwtService *common.JwtService, loginCache cache.LoginUserCache) usercase.IUserService {
+func NewUserService(jwtService *tools.JwtService, loginCache cache.LoginUserCache) usercase.IUserService {
 	return &UserService{
 		logger:     slog.Default().With("trace-name", "user-service"),
 		jwtService: jwtService,
@@ -45,7 +44,7 @@ func (u *UserService) Login(user *usercase.User) (string, error) {
 	for _, val := range users {
 		if val.Username == user.Username && val.Password == user.Password {
 			if token, err := u.jwtService.CreateToken(val); err != nil {
-				return "", res.FiberServerError("登录失败")
+				return "", tools.FiberServerError("登录失败")
 			} else {
 				// 登录成功后添加到登录用户缓存
 				u.loginCache.AddLoginUser(val)
@@ -53,5 +52,5 @@ func (u *UserService) Login(user *usercase.User) (string, error) {
 			}
 		}
 	}
-	return "", res.FiberRequestError("用户名或密码错误")
+	return "", tools.FiberRequestError("用户名或密码错误")
 }

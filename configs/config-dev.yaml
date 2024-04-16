@@ -7,7 +7,7 @@ server:
     sliding:
       enable: true
     token-bucket:
-      enable: true
+      enable: false
 data:
   # 数据库配置
   database:
