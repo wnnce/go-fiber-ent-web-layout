@@ -15,8 +15,8 @@ import (
 	"go-fiber-ent-web-layout/internal/middleware/limiter"
 	"go-fiber-ent-web-layout/internal/middleware/timeout"
 	"go-fiber-ent-web-layout/internal/tools"
+	"go-fiber-ent-web-layout/internal/tools/clog"
 	"log/slog"
-	"os"
 )
 
 var confPath string
@@ -55,7 +55,10 @@ func main() {
 	flag.Parse()
 	config := conf.ReadConfig(confPath)
 	// 初始化日志
-	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+	writer := &clog.CustomSlogWriter{}
+	// 日志SSE端口推送
+	writer.RegisterWriter(clog.GetSSEWriter())
+	handler := slog.NewJSONHandler(writer, &slog.HandlerOptions{
 		AddSource: true,
 		Level:     slog.LevelInfo,
 	})
