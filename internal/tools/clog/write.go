@@ -1,7 +1,10 @@
 package clog
 
 import (
+	"fmt"
+	"go-fiber-ent-web-layout/internal/tools/pool"
 	"io"
+	"log/slog"
 	"os"
 )
 
@@ -16,9 +19,13 @@ func (w *CustomSlogWriter) RegisterWriter(write io.Writer) *CustomSlogWriter {
 
 func (w *CustomSlogWriter) Write(p []byte) (int, error) {
 	for _, wr := range w.writes {
-		go func(write io.Writer) {
-			_, _ = write.Write(p)
-		}(wr)
+		pool.Go(func() {
+			func(write io.Writer) {
+				if _, err := write.Write(p); err != nil {
+					slog.Error(fmt.Sprintf("logger write errer message:%s", err))
+				}
+			}(wr)
+		})
 	}
 	return os.Stdout.Write(p)
 }
