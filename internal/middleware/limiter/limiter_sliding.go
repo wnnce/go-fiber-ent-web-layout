@@ -7,20 +7,20 @@ import (
 	"time"
 )
 
-type Bucket struct {
+type Window struct {
 	sync.Map
 }
 
-// Count 统计当前桶中该key的数据
-func (b *Bucket) Count(key string) int {
+// Count 统计当前窗口中该key的数据
+func (b *Window) Count(key string) int {
 	if value, ok := b.Load(key); ok {
 		return value.(int)
 	}
 	return 0
 }
 
-// Add 将key添加到桶 不存在就添加 存在就加1
-func (b *Bucket) Add(key string) {
+// Add 将key添加到窗口 不存在就添加 存在就加1
+func (b *Window) Add(key string) {
 	var newValue int
 	if value, ok := b.Load(key); ok {
 		newValue = value.(int) + 1
@@ -53,28 +53,28 @@ func NewSlidingWindow(config SlidingConfig) *SlidingWindow {
 	}
 	queue := ring.New(config.WindowNum)
 	for i := 0; i < config.WindowNum; i++ {
-		queue.Value = new(Bucket)
+		queue.Value = new(Window)
 		queue = queue.Next()
 	}
 	window.queue = queue
 	return window
 }
 
-// Record 记录请求
+// 记录请求
 func (w *SlidingWindow) record(key string) {
 	w.mutex.RLock()
 	defer w.mutex.RUnlock()
-	bucket, _ := w.queue.Value.(*Bucket)
+	bucket, _ := w.queue.Value.(*Window)
 	bucket.Add(key)
 }
 
-// Stats 获取当前所有窗口内该key的请求次数
+// 获取当前所有窗口内该key的请求次数
 func (w *SlidingWindow) stats(key string) int64 {
 	w.mutex.RLock()
 	defer w.mutex.RUnlock()
 	var sum int64
 	w.queue.Do(func(i any) {
-		bucket, _ := i.(*Bucket)
+		bucket, _ := i.(*Window)
 		sum += int64(bucket.Count(key))
 	})
 	return sum
@@ -91,7 +91,7 @@ func (w *SlidingWindow) TimingSideWindow(ctx context.Context) {
 			case <-ticker.C:
 				w.mutex.Lock()
 				w.queue = w.queue.Next()
-				w.queue.Value = new(Bucket)
+				w.queue.Value = new(Window)
 				w.mutex.Unlock()
 			case <-ctx.Done():
 				return
