@@ -52,7 +52,7 @@ func (t *TokenBucket) DoLimit(key string) bool {
 	if atomic.LoadInt64(&t.avail) <= 0 {
 		return false
 	}
-	atomic.StoreInt64(&t.avail, t.avail-1)
+	atomic.StoreInt64(&t.avail, -1)
 	return true
 }
 
