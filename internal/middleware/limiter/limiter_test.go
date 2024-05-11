@@ -3,6 +3,7 @@ package limiter
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"path"
 	"testing"
 	"time"
@@ -40,6 +41,7 @@ func TestSlidingWindow(t *testing.T) {
 	window := NewSlidingWindow(SlidingConfig{
 		Interval:  3 * time.Second,
 		WindowNum: 5,
+		Threshold: 200,
 	})
 	window.TimingSideWindow(ctx)
 	go func() {
@@ -48,7 +50,7 @@ func TestSlidingWindow(t *testing.T) {
 		for {
 			select {
 			case <-ticker.C:
-				fmt.Printf("demo: %v\n", window.DoLimit("demo"))
+				slog.Info(fmt.Sprintf("demo: %v\n", window.DoLimit("demo")))
 			case <-ctx.Done():
 				return
 			}
@@ -60,7 +62,7 @@ func TestSlidingWindow(t *testing.T) {
 		for {
 			select {
 			case <-ticker.C:
-				fmt.Printf("test: %v\n", window.DoLimit("test"))
+				slog.Info(fmt.Sprintf("test: %v\n", window.DoLimit("test")))
 			case <-ctx.Done():
 				return
 			}

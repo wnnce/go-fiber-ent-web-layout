@@ -16,6 +16,7 @@ import (
 	"go-fiber-ent-web-layout/internal/middleware/timeout"
 	"go-fiber-ent-web-layout/internal/tools"
 	"go-fiber-ent-web-layout/internal/tools/clog"
+	"go-fiber-ent-web-layout/internal/tools/hand"
 	"log/slog"
 )
 
@@ -24,15 +25,16 @@ var confPath string
 // 创建fiber app 包含注入中间件、错误处理、路由绑定等操作
 func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth *auth.AuthMiddleware) *fiber.App {
 	app := fiber.New(fiber.Config{
-		AppName:      cf.Name,                  // 应用名称
-		ErrorHandler: tools.CustomErrorHandler, // 自定义错误处理器
-		JSONDecoder:  sonic.Unmarshal,          // 使用sonic进行Json序列化
-		JSONEncoder:  sonic.Marshal,            // 使用sonic进行Json解析
+		AppName:         cf.Name,                        // 应用名称
+		ErrorHandler:    hand.CustomErrorHandler,        // 自定义错误处理器
+		JSONDecoder:     sonic.Unmarshal,                // 使用sonic进行Json序列化
+		JSONEncoder:     sonic.Marshal,                  // 使用sonic进行Json解析
+		StructValidator: tools.DefaultStructValidator(), // 结构体参数验证
 	})
 	// 防止程序panic 使用自定义的处理器 记录异常
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace:  true,
-		StackTraceHandler: tools.CustomStackTraceHandler,
+		StackTraceHandler: hand.StackTraceHandler,
 	}))
 	// 使用超时中间件
 	app.Use(timeout.NewMiddleware(cf.Timeout))

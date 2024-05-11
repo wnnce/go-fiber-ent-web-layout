@@ -40,11 +40,8 @@ func (e *ExampleApi) ListExample(ctx fiber.Ctx) error {
 
 func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
 	example := &ent.Example{}
-	if err := ctx.Bind().JSON(example); err != nil {
+	if err := ctx.Bind().Body(example); err != nil {
 		return err
-	}
-	if errorMessage := tools.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(tools.FiberRequestError(errorMessage))
 	}
 	if err := e.service.SaveExample(example); err != nil {
 		return err
@@ -54,11 +51,8 @@ func (e *ExampleApi) SaveExample(ctx fiber.Ctx) error {
 
 func (e *ExampleApi) UpdateExample(ctx fiber.Ctx) error {
 	example := &ent.Example{}
-	if err := ctx.Bind().JSON(example); err != nil {
+	if err := ctx.Bind().Body(example); err != nil {
 		return err
-	}
-	if errorMessage := tools.StructFieldValidation(example); len(errorMessage) > 0 {
-		return ctx.JSON(tools.FiberRequestError(errorMessage))
 	}
 	if example.ID <= 0 {
 		return ctx.JSON(tools.FiberRequestError("example不存在"))
