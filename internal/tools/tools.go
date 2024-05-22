@@ -2,17 +2,16 @@ package tools
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"net/http"
 )
 
 func FiberRequestError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusBadRequest, message)
+	return fiber.NewError(fiber.StatusBadRequest, message)
 }
 
 func FiberAuthError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusUnauthorized, message)
+	return fiber.NewError(fiber.StatusUnauthorized, message)
 }
 
 func FiberServerError(message string) *fiber.Error {
-	return fiber.NewError(http.StatusInternalServerError, message)
+	return fiber.NewError(fiber.StatusInternalServerError, message)
 }

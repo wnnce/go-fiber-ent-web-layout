@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/internal/tools/res"
-	"net/http"
 )
 
 var defaultErrorHandlerChain *errorHandlerChain
@@ -33,7 +32,7 @@ func FiberErrorHandler(err error) *ErrorHandlerResult {
 
 // CustomErrorHandler 自定义的错误处理
 func CustomErrorHandler(ctx fiber.Ctx, err error) error {
-	code, message := http.StatusInternalServerError, err.Error()
+	code, message := fiber.StatusInternalServerError, err.Error()
 	if result := defaultErrorHandlerChain.DoHandler(err); result != nil {
 		code = result.Code
 		message = result.Message

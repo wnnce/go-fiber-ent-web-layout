@@ -6,7 +6,6 @@ import (
 	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/tools"
 	"go-fiber-ent-web-layout/internal/usercase"
-	"net/http"
 	"time"
 )
 
@@ -73,6 +72,6 @@ func (a *AuthMiddleware) VerifyPermissions(permissions ...string) fiber.Handler 
 				}
 			}
 		}
-		return fiber.NewError(http.StatusForbidden, "No permission")
+		return fiber.NewError(fiber.StatusForbidden, "No permission")
 	}
 }

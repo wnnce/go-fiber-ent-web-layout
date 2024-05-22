@@ -1,7 +1,7 @@
 package res
 
 import (
-	"net/http"
+	"github.com/gofiber/fiber/v3"
 	"time"
 )
 
@@ -14,7 +14,7 @@ type Result[T any] struct {
 
 func Ok[T any](message string, data T) *Result[T] {
 	return &Result[T]{
-		Code:      http.StatusOK,
+		Code:      fiber.StatusOK,
 		Message:   message,
 		Timestamp: time.Now().UnixMilli(),
 		Data:      data,
@@ -23,7 +23,7 @@ func Ok[T any](message string, data T) *Result[T] {
 
 func OkByMessage(message string) *Result[any] {
 	return &Result[any]{
-		Code:      http.StatusOK,
+		Code:      fiber.StatusOK,
 		Message:   message,
 		Timestamp: time.Now().UnixMilli(),
 	}
@@ -31,7 +31,7 @@ func OkByMessage(message string) *Result[any] {
 
 func OkByData[T any](data T) *Result[T] {
 	return &Result[T]{
-		Code:      http.StatusOK,
+		Code:      fiber.StatusOK,
 		Message:   "ok",
 		Timestamp: time.Now().UnixMilli(),
 		Data:      data,
