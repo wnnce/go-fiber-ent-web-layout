@@ -17,10 +17,10 @@ func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi
 	manageRoute.Get("/logger/sse/:interval<int;min<100>>", manage.LoggerPush)
 
 	exampleRoute := app.Group("/example", auth.TokenAuth)
-	exampleRoute.Post("/", auth.VerifyPermissions("example:save"), eApi.SaveExample)
-	exampleRoute.Put("/", auth.VerifyPermissions("example:update"), eApi.UpdateExample)
-	exampleRoute.Get("/list", auth.VerifyPermissions("example:list"), eApi.ListExample)
-	exampleRoute.Get("/:id<int;min(1)>", eApi.QueryExample)
+	exampleRoute.Post("/", eApi.SaveExample, auth.VerifyPermissions("example:save"))
+	exampleRoute.Put("/", eApi.UpdateExample, auth.VerifyPermissions("example:update"))
+	exampleRoute.Get("/list", eApi.ListExample, auth.VerifyPermissions("example:list"))
+	exampleRoute.Get("/:id<int;min(1)>", eApi.QueryExample, auth.VerifyPermissions("example:query"))
 
 	userRoute := app.Group("/user")
 	userRoute.Post("/login", uApi.Login)
