@@ -11,10 +11,8 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"
-	"go-fiber-ent-web-layout/internal/cache"
 	"go-fiber-ent-web-layout/internal/conf"
 	"go-fiber-ent-web-layout/internal/data"
-	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/service"
 )
 
@@ -29,11 +27,9 @@ func wireApp(contextContext context.Context, confData *conf.Data, jwt *conf.Jwt,
 	iExampleRepo := data.NewExampleRepo(dataData)
 	iExampleService := service.NewExampleService(iExampleRepo)
 	exampleApi := example.NewExampleApi(iExampleService)
-	loginUserCache := cache.NewLoginUserCache()
-	iUserService := service.NewUserService(loginUserCache)
+	iUserService := service.NewUserService()
 	userApi := user.NewUserApi(iUserService)
-	authMiddleware := auth.NewAuthMiddleware(loginUserCache)
-	app := newApp(contextContext, server, exampleApi, userApi, authMiddleware)
+	app := newApp(contextContext, server, exampleApi, userApi)
 	return app, func() {
 		cleanup()
 	}, nil

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"go-fiber-ent-web-layout/internal/cache"
+	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/tools"
 	"go-fiber-ent-web-layout/internal/usercase"
 )
@@ -25,14 +25,10 @@ var users = []*usercase.User{
 	},
 }
 
-type UserService struct {
-	loginCache cache.LoginUserCache
-}
+type UserService struct{}
 
-func NewUserService(loginCache cache.LoginUserCache) usercase.IUserService {
-	return &UserService{
-		loginCache: loginCache,
-	}
+func NewUserService() usercase.IUserService {
+	return &UserService{}
 }
 
 func (u *UserService) Login(user *usercase.User) (string, error) {
@@ -42,7 +38,7 @@ func (u *UserService) Login(user *usercase.User) (string, error) {
 				return "", tools.FiberServerError("登录失败")
 			} else {
 				// 登录成功后添加到登录用户缓存
-				u.loginCache.AddLoginUser(val)
+				auth.AddLoginUser(val.UserId, val, auth.LoginUserCacheExpireTime)
 				return token, nil
 			}
 		}

@@ -12,7 +12,7 @@ import (
 var InjectSet = wire.NewSet(example.NewExampleApi, user.NewUserApi)
 
 // RegisterRoutes 全局路由绑定处理函数 在newApp函数中调用 不然wire无法处理依赖注入
-func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi, auth *auth.AuthMiddleware) {
+func RegisterRoutes(app *fiber.App, eApi *example.ExampleApi, uApi *user.UserApi) {
 	manageRoute := app.Group("/manage")
 	manageRoute.Get("/logger/sse/:interval<int;min<100>>", manage.LoggerPush)
 

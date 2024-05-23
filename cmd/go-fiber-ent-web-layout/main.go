@@ -11,7 +11,6 @@ import (
 	"go-fiber-ent-web-layout/api/example/v1"
 	"go-fiber-ent-web-layout/api/user/v1"
 	"go-fiber-ent-web-layout/internal/conf"
-	"go-fiber-ent-web-layout/internal/middleware/auth"
 	"go-fiber-ent-web-layout/internal/middleware/limiter"
 	"go-fiber-ent-web-layout/internal/middleware/timeout"
 	"go-fiber-ent-web-layout/internal/tools"
@@ -23,7 +22,7 @@ import (
 var confPath string
 
 // 创建fiber app 包含注入中间件、错误处理、路由绑定等操作
-func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi, auth *auth.AuthMiddleware) *fiber.App {
+func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi *user.UserApi) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:         cf.Name,                        // 应用名称
 		ErrorHandler:    hand.CustomErrorHandler,        // 自定义错误处理器
@@ -45,7 +44,7 @@ func newApp(ctx context.Context, cf *conf.Server, eApi *example.ExampleApi, uApi
 		Sliding:         cf.Limiter.Sliding,
 		TokenBucket:     cf.Limiter.TokenBucket,
 	}, ctx))
-	api.RegisterRoutes(app, eApi, uApi, auth)
+	api.RegisterRoutes(app, eApi, uApi)
 	return app
 }
 
